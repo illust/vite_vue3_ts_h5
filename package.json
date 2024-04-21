@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
+    "build:dev": "vite build --mode development",
+    "build:pro": "vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint src --fix --ext .ts,.tsx,.vue,.js,.jsx",
     "prettier": "prettier --write .",
@@ -23,10 +25,12 @@
     "nprogress": "^0.2.0",
     "prettier": "^3.2.5",
     "sass": "^1.75.0",
+    "vite-plugin-compression": "^0.5.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "@vitejs/plugin-vue": "^5.0.4",
