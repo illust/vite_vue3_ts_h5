@@ -37,4 +37,8 @@ const count = ref(0)
 h1 {
   background-color: $test-color;
 }
+.card {
+  width: 250px;
+  background-color: #85eb98;
+}
 </style>
