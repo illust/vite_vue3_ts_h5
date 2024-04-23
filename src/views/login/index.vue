@@ -124,10 +124,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
   }
   formEl.validate((valid) => {
     if (valid) {
-      console.log('submit!')
       router.push('/home')
     } else {
-      console.log('error submit!')
       return false
     }
   })
