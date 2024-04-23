@@ -2,12 +2,18 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { defineConfig } from 'vite'
 import viteCompression from 'vite-plugin-compression'
+import components from 'unplugin-vue-components/vite'
+import { VarletUIResolver } from 'unplugin-vue-components/resolvers'
+
 import postcsspxtoviewport from 'postcss-px-to-viewport'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    components({
+      resolvers: [VarletUIResolver()],
+    }),
     // gzip压缩 生产环境生成.gz文件
     viteCompression({
       verbose: true,
