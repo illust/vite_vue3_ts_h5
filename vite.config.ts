@@ -3,7 +3,9 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import viteCompression from 'vite-plugin-compression'
 import components from 'unplugin-vue-components/vite'
-import { VarletUIResolver } from 'unplugin-vue-components/resolvers'
+import { VantResolver } from '@vant/auto-import-resolver'
+import VueSetupExtend from 'vite-plugin-vue-setup-extend'
+import autoImport from 'unplugin-auto-import/vite'
 
 import postcsspxtoviewport from 'postcss-px-to-viewport'
 
@@ -11,8 +13,12 @@ import postcsspxtoviewport from 'postcss-px-to-viewport'
 export default defineConfig({
   plugins: [
     vue(),
+    VueSetupExtend(),
     components({
-      resolvers: [VarletUIResolver()],
+      resolvers: [VantResolver()],
+    }),
+    autoImport({
+      resolvers: [VantResolver()],
     }),
     // gzip压缩 生产环境生成.gz文件
     viteCompression({
