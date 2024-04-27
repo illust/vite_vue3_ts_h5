@@ -31,7 +31,7 @@
   </div>
   <a
     href="https://beian.miit.gov.cn/"
-    style="position: fixed; bottom: 60px; left: calc(50% - 89px)"
+    style="position: fixed; bottom: 2px; left: calc(50% - 89px)"
     target="_blank"
     >京ICP备2024063915号-1</a
   >
@@ -99,6 +99,17 @@ const disabledInput = () => {
   }
 }
 
+/**
+ * 词盘点击输入算法：
+ *    1.任意点击一个input，通过取class判断得到横纵索引indies<number>[]
+ *    2.根据输入方向inputDirection确定左右或者上下相邻输入框是否同时为disabled：
+ *        2.1 点击输入框时inputDirection默认为true，即横向，先判断左右输入框是否均为disabled
+ *        2.2 是则置inputDirection为false，纵向输入，上下遍历选择不为disabled的若干输入框作为单个词条整体
+ *        2.3 否则不变，横向输入，左右遍历选择不为disabled的若干输入框作为单个词条整体
+ *        2.4 注意边界情况
+ *    3.如果在同一个输入框再次点击，切换输入方向，在对应方向上遍历出单个词条
+ *    4.如果点击其他输入框，重复步骤2,3
+ */
 const inputDirection = ref(true) // 输入方向：true:横向 false:纵向
 const heightLightInput = () => {
   let adjInputsArray: string[] = []
@@ -157,18 +168,6 @@ const heightLightInput = () => {
     })
   })
 }
-
-/**
- * 词盘点击输入算法：
- *    1.任意点击一个input，通过取class判断得到横纵索引indies<number>[]
- *    2.根据输入方向inputDirection确定左右或者上下相邻输入框是否同时为disabled：
- *        2.1 点击输入框时inputDirection默认为true，即横向，先判断左右输入框是否均为disabled
- *        2.2 是则置inputDirection为false，纵向输入，上下遍历选择不为disabled的若干输入框作为单个词条整体
- *        2.3 否则不变，横向输入，左右遍历选择不为disabled的若干输入框作为单个词条整体
- *        2.4 注意边界情况
- *    3.如果在同一个输入框再次点击，切换输入方向，在对应方向上遍历出单个词条
- *    4.如果点击其他输入框，重复步骤2,3
- */
 
 // params: rowIndex, colIndex, inputDirection
 // output: adjInputsArray
@@ -309,7 +308,7 @@ onMounted(() => {
 
   .fillin-col {
     display: flex;
-    flex: 2;
+    flex: 4;
     flex-direction: column;
     width: 100vw;
     height: auto;
@@ -345,7 +344,7 @@ onMounted(() => {
     flex: 1;
     flex-direction: row;
     position: relative;
-    margin-top: 20px;
+    // margin-top: 20px;
 
     .left-control {
       flex: 1;
@@ -359,8 +358,8 @@ onMounted(() => {
     }
 
     .middle-puz {
-      flex: 5;
-      height: 40%;
+      flex: 6;
+      height: 50%;
       border: solid rgb(67, 117, 190) 2px;
     }
 
