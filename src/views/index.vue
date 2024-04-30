@@ -139,7 +139,6 @@ const heightLightInput = () => {
       } else {
         inputDirection.value = !inputDirection.value
       }
-      console.log('e.target', e.target)
 
       // 获取当前坐标
       const rowIndex = parseInt(input.classList[0].split('-')[0].match(/\d+/)[0])
