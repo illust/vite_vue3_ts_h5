@@ -114,7 +114,7 @@ const inputDirection = ref(true) // 输入方向：true:横向 false:纵向
 const heightLightInput = () => {
   let adjInputsArray: string[] = []
 
-  // 获取第一个输入框元素
+  // 自动选定第一个输入框元素，并设置样式
   const inputFirst = document.querySelector('input') as HTMLElement
   if (inputFirst) {
     inputFirst.classList.add('highlight')
@@ -168,8 +168,13 @@ const heightLightInput = () => {
   })
 }
 
-// params: rowIndex, colIndex, inputDirection
-// output: adjInputsArray
+/**
+ *
+ * @param rowIndex 横坐标
+ * @param colIndex 纵坐标
+ * @param inputDirection 输入方向
+ * @returns 邻接输入框坐标数组
+ */
 const getAdjInputsArray = (
   rowIndex: number,
   colIndex: number,
