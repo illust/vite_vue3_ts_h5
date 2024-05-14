@@ -2,13 +2,12 @@
   <div class="container">
     <div class="fillin-col">
       <div v-for="r in 10" :key="r" class="fillin-row">
-        <input
-          v-for="c in 10"
-          :key="c"
-          type="text"
-          maxlength="1"
-          :class="[highLight ? 'highlight' : '', `r${r}-c${c}`]"
-        />
+        <div v-for="c in 10" :key="c">
+          <span class="my_input_preffix">
+            <div class="my_input_preffix_icon">四</div>
+          </span>
+          <input type="text" maxlength="1" :class="[highLight ? 'highlight' : '', `r${r}-c${c}`]" />
+        </div>
       </div>
     </div>
     <div class="puzzles">
@@ -146,11 +145,17 @@ const heightLightInput = () => {
       // true:横向 false:竖向
       if (inputDirection.value) {
         adjInputsArray = getAdjInputsArray(rowIndex, colIndex, true)
+        if (adjInputsArray.length === 1) {
+          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, false)
+        }
       } else {
         adjInputsArray = getAdjInputsArray(rowIndex, colIndex, false)
+        if (adjInputsArray.length === 1) {
+          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, true)
+        }
       }
-      setCurrInputsBackground(adjInputsArray)
       removeLastInputsBackground(lastInputsArray)
+      setCurrInputsBackground(adjInputsArray)
       lastInputsArray = adjInputsArray
 
       // 移除所有输入框的高亮样式
@@ -248,7 +253,7 @@ const setCurrInputsBackground = (arr: string[]): any => {
 const removeLastInputsBackground = (arr: string[]): any => {
   for (let i = 0; i < arr.length; i++) {
     const input = document.querySelector(arr[i])
-    input.style.backgroundColor = '#bbb5b5'
+    input.style.backgroundColor = '#d9d9d9'
   }
 }
 
@@ -298,7 +303,6 @@ onMounted(() => {
   puzShow.value = rowPuzzles.value[0]
   disabledInput()
   heightLightInput()
-  // inputTransformer()
 })
 </script>
 
@@ -312,7 +316,7 @@ onMounted(() => {
 
   .fillin-col {
     display: flex;
-    flex: 4;
+    flex: 2;
     flex-direction: column;
     width: 100vw;
     height: auto;
@@ -322,9 +326,38 @@ onMounted(() => {
       flex-direction: row;
       width: 100%;
       height: 100%;
+      .my_input_preffix {
+        position: absolute;
+        left: 5px;
+        height: 10%;
+        top: 0;
+        text-align: center;
+        transition: all 0.3s;
+        pointer-events: none;
+      }
+      .my_input_preffix_icon {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        /* 这里我们换一种垂直对齐方式 */
+        /* 这里不设置line-height */
+        /* line-height: 40px; */
+        text-align: center;
+      }
+      .my_input_preffix_icon:before {
+        color: rgb(0, 0, 0);
+        /* 设置高度 */
+        height: 80%;
+        /* 通过flex来垂直对齐before中的内容 */
+        display: flex;
+        align-items: center;
+        font-style: normal;
+        // font-family: 'Times New Roman', Times, serif;
+      }
       input {
-        width: 10%;
-        background-color: #bbb5b5;
+        width: 92%;
+        height: 92%;
+        background-color: #d9d9d9;
         border-radius: 2px;
         margin: 2px 2px;
         text-align: center;
