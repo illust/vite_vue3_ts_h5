@@ -2,10 +2,7 @@
   <div class="container">
     <div class="fillin-col">
       <div v-for="r in 10" :key="r" class="fillin-row">
-        <div v-for="c in 10" :key="c">
-          <span class="my_input_preffix">
-            <div class="my_input_preffix_icon">四</div>
-          </span>
+        <div v-for="c in 10" :key="c" style="width: 9.95%">
           <input type="text" maxlength="1" :class="[highLight ? 'highlight' : '', `r${r}-c${c}`]" />
         </div>
       </div>
@@ -43,7 +40,7 @@ import { onMounted, ref } from 'vue'
 const highLight = ref(false)
 const puzShow = ref('')
 
-// 固定位置input置为disabled
+// 固定位置input置为disabled,黑色输入框
 const disabledInputIndies = ref([
   '.r1-c8',
   '.r1-c10',
@@ -88,6 +85,39 @@ const disabledInputIndies = ref([
   '.r10-c5',
   '.r10-c10',
 ])
+// 水平、竖直方向输入框数字标识索引数组
+const horInputNumInx = ref([
+  '.r1-c1',
+  '.r2-c8',
+  '.r3-c3',
+  '.r3-c7',
+  '.r5-c5',
+  '.r6-c1',
+  '.r6-c8',
+  '.r7-c5',
+  '.r8-c2',
+  '.r8-c8',
+  '.r9-c1',
+  '.r9-c4',
+  '.r10-c3',
+  '.r10-c6',
+])
+const verInputNumInx = ref([
+  '.r1-c1',
+  '.r5-c1',
+  '.r6-c2',
+  '.r1-c3',
+  '.r8-c4',
+  '.r3-c5',
+  '.r9-c6',
+  '.r2-c8',
+  '.r5-c8',
+  '.r1-c9',
+  '.r2-c10',
+])
+const numHanzi = ref(['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一'])
+const curNumIndex = ref('')
+
 const disabledInput = () => {
   for (let i = 0; i < disabledInputIndies.value.length; i++) {
     const disInput = document.querySelector<HTMLElement>(disabledInputIndies.value[i])
@@ -131,6 +161,11 @@ const heightLightInput = () => {
   // 遍历每个输入框，为其添加点击事件监听器
   inputs.forEach((input) => {
     input.addEventListener('click', (e) => {
+      const spans = document.getElementsByClassName('my_input_preffix')
+      // 遍历这些元素，并逐个删除
+      for (let i = spans.length - 1; i >= 0; i--) {
+        spans[i].parentNode.removeChild(spans[i])
+      }
       // 相邻两次点击不是同一个input
       if (e.target.classList[0] !== lastClickedInput) {
         inputDirection.value = true
@@ -146,16 +181,37 @@ const heightLightInput = () => {
       if (inputDirection.value) {
         adjInputsArray = getAdjInputsArray(rowIndex, colIndex, true)
         if (adjInputsArray.length === 1) {
-          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, false)
+          inputDirection.value = !inputDirection.value
+          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, inputDirection.value)
         }
       } else {
         adjInputsArray = getAdjInputsArray(rowIndex, colIndex, false)
         if (adjInputsArray.length === 1) {
-          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, true)
+          inputDirection.value = !inputDirection.value
+          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, inputDirection.value)
         }
       }
       removeLastInputsBackground(lastInputsArray)
       setCurrInputsBackground(adjInputsArray)
+
+      if (inputDirection.value) {
+        curNumIndex.value = (horInputNumInx.value.indexOf(adjInputsArray[0]) + 1).toString()
+        puzShow.value = rowPuzzles.value[horInputNumInx.value.indexOf(adjInputsArray[0])]
+      } else {
+        curNumIndex.value = numHanzi.value[verInputNumInx.value.indexOf(adjInputsArray[0])]
+        puzShow.value = colPuzzles.value[verInputNumInx.value.indexOf(adjInputsArray[0])]
+      }
+      console.log('curNumIndex.value', curNumIndex.value)
+      const el = document.querySelector(adjInputsArray[0])
+      const elNew = document.createElement('span')
+      elNew.setAttribute('class', 'my_input_preffix')
+      elNew.style.position = 'absolute'
+      elNew.style.marginLeft = '3px'
+      elNew.style.marginTop = '3px'
+      elNew.style.fontSize = '12px'
+      elNew.innerHTML = curNumIndex.value
+      el?.parentNode?.insertBefore(elNew, el)
+
       lastInputsArray = adjInputsArray
 
       // 移除所有输入框的高亮样式
@@ -221,7 +277,7 @@ const getAdjInputsArray = (
   return adjInputsArray
 }
 
-// row or col : 3, arr: [1,5,10],return [1,5]
+// row or col element: 3, find subarr in arr: [1,5,10],return subarr: [1,5]
 const selectInputIndices = (
   arr: number[],
   num: number,
@@ -269,7 +325,9 @@ const rowPuzzles = ref([
   '9.巴西职业足球运动员罗纳尔多的绰号。',
   '10.将宽度不等的多个黑条和空白，按照一定的编码规则排列，用以表达一组信息的图形标识符。',
   '11.中国台湾男歌手、音乐人。代表作《我很丑，可是我很温柔》《我是一只小小鸟》《爱要怎么说出口》《给所有知道我名字的人》。',
-  '12.足球比赛中，轨迹怪异到让门将都没办法的进球。13.河北省辖县级市，以金丝小枣、鸭梨、驴肉火烧闻名。14.一家意大利汽车生产商，全球顶级跑车制造商。标志是一头充满力量的斗牛。',
+  '12.足球比赛中，轨迹怪异到让门将都没办法的进球。',
+  '13.河北省辖县级市，以金丝小枣、鸭梨、驴肉火烧闻名。',
+  '14.一家意大利汽车生产商，全球顶级跑车制造商。标志是一头充满力量的斗牛。',
 ])
 const colPuzzles = ref([
   '一、生物体生命活动的内在节律性，由生物体内的时间结构序所决定。',
@@ -335,25 +393,26 @@ onMounted(() => {
         transition: all 0.3s;
         pointer-events: none;
       }
-      .my_input_preffix_icon {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        /* 这里我们换一种垂直对齐方式 */
-        /* 这里不设置line-height */
-        /* line-height: 40px; */
-        text-align: center;
-      }
-      .my_input_preffix_icon:before {
-        color: rgb(0, 0, 0);
-        /* 设置高度 */
-        height: 80%;
-        /* 通过flex来垂直对齐before中的内容 */
-        display: flex;
-        align-items: center;
-        font-style: normal;
-        // font-family: 'Times New Roman', Times, serif;
-      }
+      // .my_input_preffix_icon {
+      //   display: inline-block;
+      //   width: 10px;
+      //   height: 10px;
+      //   /* 这里我们换一种垂直对齐方式 */
+      //   /* 这里不设置line-height */
+      //   /* line-height: 40px; */
+      //   text-align: center;
+      //   font-size: smaller;
+      // }
+      // .my_input_preffix_icon:before {
+      //   color: rgb(0, 0, 0);
+      //   /* 设置高度 */
+      //   height: 80%;
+      //   /* 通过flex来垂直对齐before中的内容 */
+      //   display: flex;
+      //   align-items: center;
+      //   font-style: normal;
+      //   // font-family: 'Times New Roman', Times, serif;
+      // }
       input {
         width: 92%;
         height: 92%;
@@ -361,6 +420,8 @@ onMounted(() => {
         border-radius: 2px;
         margin: 2px 2px;
         text-align: center;
+        font-weight: bolder;
+        font-size: 18px;
         border: none;
         caret-color: transparent;
         box-sizing: border-box;

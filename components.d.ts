@@ -7,8 +7,10 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    BottomNav: (typeof import('./src/components/BottomNav/index.vue'))['default']
-    RouterLink: (typeof import('vue-router'))['RouterLink']
-    RouterView: (typeof import('vue-router'))['RouterView']
+    BottomNav: typeof import('./src/components/BottomNav/index.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
+    VanTabbar: (typeof import('vant/es'))['Tabbar']
+    VanTabbarItem: (typeof import('vant/es'))['TabbarItem']
   }
 }
