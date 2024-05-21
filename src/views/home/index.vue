@@ -3,7 +3,14 @@
     <div class="fillin-col">
       <div v-for="r in 10" :key="r" class="fillin-row">
         <div v-for="c in 10" :key="c" style="width: 9.95%">
-          <input type="text" maxlength="1" :class="[highLight ? 'highlight' : '', `r${r}-c${c}`]" />
+          <input
+            type="text"
+            maxlength="10"
+            :class="[highLight ? 'highlight' : '', `r${r}-c${c}`]"
+            @input="inputChange"
+            @compositionstart="onCompositionStart"
+            @compositionend="onCompositionEnd"
+          />
         </div>
       </div>
     </div>
@@ -15,7 +22,9 @@
           @click="clickLeftButton"
         ></button>
       </div>
-      <div class="middle-puz">{{ puzShow }}</div>
+      <div class="middle-puz">
+        <van-notice-bar :text="puzShow" />
+      </div>
       <div class="right-control">
         <button
           class="right-btn"
@@ -25,18 +34,20 @@
       </div>
     </div>
   </div>
-  <a
+  <van-floating-bubble axis="xy" icon="clock" magnetic="x" @offset-change="onOffsetChange" />
+  <!-- <a
     href="https://beian.miit.gov.cn/"
     style="position: fixed; bottom: 2px; left: calc(50% - 89px)"
     target="_blank"
     >京ICP备2024063915号-1</a
-  >
-  <!-- <bottom-nav></bottom-nav> -->
+  > -->
+  <bottom-nav></bottom-nav>
 </template>
 
 <script setup lang="ts">
-// import BottomNav from '@/components/BottomNav/index.vue';
-import { onMounted, ref } from 'vue'
+import BottomNav from '@/components/BottomNav/index.vue'
+import { showToast } from 'vant'
+import { onMounted, ref, toRaw } from 'vue'
 const highLight = ref(false)
 const puzShow = ref('')
 
@@ -140,31 +151,45 @@ const disabledInput = () => {
  *    4.如果点击其他输入框，重复步骤2,3
  */
 const inputDirection = ref(true) // 输入方向：true:横向 false:纵向
-const heightLightInput = () => {
-  let adjInputsArray: string[] = []
+const currInput = ref('')
+const adjInputsArray = ref<string[]>([]) // 邻接输入框坐标数组
 
+const heightLightInput = () => {
   // 自动选定第一个输入框元素，并设置样式
   const inputFirst = document.querySelector('input') as HTMLElement
   if (inputFirst) {
+    inputFirst.focus()
     inputFirst.classList.add('highlight')
     inputFirst.style.borderColor = 'green'
     inputFirst.style.borderRadius = '1px'
     inputFirst.style.borderStyle = 'solid'
-    adjInputsArray = getAdjInputsArray(1, 1, true)
-    setCurrInputsBackground(adjInputsArray)
+    adjInputsArray.value = getAdjInputsArray(1, 1, true)
+    setCurrInputsBackground(adjInputsArray.value)
+
+    const elNew = document.createElement('span')
+    elNew.setAttribute('class', 'my_input_preffix')
+    elNew.style.position = 'absolute'
+    elNew.style.marginLeft = '3px'
+    elNew.style.marginTop = '3px'
+    elNew.style.fontSize = '12px'
+    elNew.innerHTML = '1'
+    inputFirst?.parentNode?.insertBefore(elNew, inputFirst)
   }
 
   // 获取所有的输入框元素
   const inputs = document.querySelectorAll('input')
   let lastClickedInput = 'r1-c1'
-  let lastInputsArray: any = adjInputsArray
+  currInput.value = '.r1-c1'
+  let lastInputsArray: any = adjInputsArray.value
   // 遍历每个输入框，为其添加点击事件监听器
   inputs.forEach((input) => {
     input.addEventListener('click', (e) => {
       const spans = document.getElementsByClassName('my_input_preffix')
       // 遍历这些元素，并逐个删除
-      for (let i = spans.length - 1; i >= 0; i--) {
-        spans[i].parentNode.removeChild(spans[i])
+      if (spans) {
+        for (let i = spans.length - 1; i >= 0; i--) {
+          spans[i].parentNode.removeChild(spans[i])
+        }
       }
       // 相邻两次点击不是同一个input
       if (e.target.classList[0] !== lastClickedInput) {
@@ -177,32 +202,34 @@ const heightLightInput = () => {
       // 获取当前坐标
       const rowIndex = parseInt(input.classList[0].split('-')[0].match(/\d+/)[0])
       const colIndex = parseInt(input.classList[0].split('-')[1].match(/\d+/)[0])
+      currInput.value = '.' + input.classList[0]
+
       // true:横向 false:竖向
       if (inputDirection.value) {
-        adjInputsArray = getAdjInputsArray(rowIndex, colIndex, true)
-        if (adjInputsArray.length === 1) {
+        adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, true)
+        if (adjInputsArray.value.length === 1) {
           inputDirection.value = !inputDirection.value
-          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, inputDirection.value)
+          adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, inputDirection.value)
         }
       } else {
-        adjInputsArray = getAdjInputsArray(rowIndex, colIndex, false)
-        if (adjInputsArray.length === 1) {
+        adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, false)
+        if (adjInputsArray.value.length === 1) {
           inputDirection.value = !inputDirection.value
-          adjInputsArray = getAdjInputsArray(rowIndex, colIndex, inputDirection.value)
+          adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, inputDirection.value)
         }
       }
       removeLastInputsBackground(lastInputsArray)
-      setCurrInputsBackground(adjInputsArray)
+      setCurrInputsBackground(adjInputsArray.value)
 
       if (inputDirection.value) {
-        curNumIndex.value = (horInputNumInx.value.indexOf(adjInputsArray[0]) + 1).toString()
-        puzShow.value = rowPuzzles.value[horInputNumInx.value.indexOf(adjInputsArray[0])]
+        curNumIndex.value = (horInputNumInx.value.indexOf(adjInputsArray.value[0]) + 1).toString()
+        puzShow.value = rowPuzzles.value[horInputNumInx.value.indexOf(adjInputsArray.value[0])]
       } else {
-        curNumIndex.value = numHanzi.value[verInputNumInx.value.indexOf(adjInputsArray[0])]
-        puzShow.value = colPuzzles.value[verInputNumInx.value.indexOf(adjInputsArray[0])]
+        curNumIndex.value = numHanzi.value[verInputNumInx.value.indexOf(adjInputsArray.value[0])]
+        puzShow.value = colPuzzles.value[verInputNumInx.value.indexOf(adjInputsArray.value[0])]
       }
-      console.log('curNumIndex.value', curNumIndex.value)
-      const el = document.querySelector(adjInputsArray[0])
+
+      const el = document.querySelector(adjInputsArray.value[0])
       const elNew = document.createElement('span')
       elNew.setAttribute('class', 'my_input_preffix')
       elNew.style.position = 'absolute'
@@ -212,7 +239,9 @@ const heightLightInput = () => {
       elNew.innerHTML = curNumIndex.value
       el?.parentNode?.insertBefore(elNew, el)
 
-      lastInputsArray = adjInputsArray
+      console.log('adjInputsArray.value', toRaw(adjInputsArray.value))
+
+      lastInputsArray = adjInputsArray.value
 
       // 移除所有输入框的高亮样式
       inputs.forEach((i) => {
@@ -313,6 +342,26 @@ const removeLastInputsBackground = (arr: string[]): any => {
   }
 }
 
+const inputValue = ref('') // 连续输入中文
+const inputChange = (e: { target: { value: any } }) => {
+  inputValue.value = e.target.value
+
+  const inputIndex = toRaw(adjInputsArray.value).indexOf(currInput.value)
+  console.log('input', e.target.value)
+  console.log('inputIndex', inputIndex)
+  for (let i = inputIndex; i < toRaw(inputValue.value).length; i++) {
+    const inputEl = document.querySelector(toRaw(adjInputsArray.value)[i])
+    inputEl.value = inputValue.value[i - inputIndex]
+  }
+}
+
+const onCompositionStart = () => {
+  console.log('compositionstart111')
+}
+const onCompositionEnd = () => {
+  console.log('compositionend')
+}
+
 const rowPuzzles = ref([
   '1.辛弃疾《南乡子·登京口北固亭有怀》中的一句，上句为天下英雄谁敌手？曹刘。',
   '2.1905年谭鑫培主演的中国第一部电影。',
@@ -355,6 +404,10 @@ const clickRightButton = () => {
     const index = rowPuzzles.value.indexOf(puzShow.value)
     puzShow.value = rowPuzzles.value[index + 1]
   }
+}
+
+const onOffsetChange = (offset: { x: number; y: number }) => {
+  showToast(`x: ${offset.x.toFixed(0)}, y: ${offset.y.toFixed(0)}`)
 }
 
 onMounted(() => {
@@ -451,14 +504,15 @@ onMounted(() => {
       .left-btn {
         background: url('@/assets/image/left-button-fill.png') no-repeat;
         background-size: 100% 100%;
+        margin-top: 5px;
         border: none !important;
       }
     }
 
     .middle-puz {
       flex: 6;
-      height: 50%;
-      border: solid rgb(67, 117, 190) 2px;
+      height: 20%;
+      // border: solid rgb(67, 117, 190) 2px;
     }
 
     .right-control {
@@ -469,6 +523,8 @@ onMounted(() => {
       .right-btn {
         background: url('@/assets/image/right-button-fill.png') no-repeat;
         background-size: 100% 100%;
+        margin-top: 5px;
+
         border: none !important;
       }
     }
@@ -480,5 +536,12 @@ onMounted(() => {
   //   border-style: solid;
   //   box-sizing: border-box;
   // }
+  ::v-deep .van-icon-clock:before {
+    content: 'hh';
+  }
+
+  ::v-deep .van-notice-bar__wrap {
+    width: 100%;
+  }
 }
 </style>
