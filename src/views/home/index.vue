@@ -33,6 +33,7 @@
         ></button>
       </div>
     </div>
+    <submit-button></submit-button>
   </div>
   <van-floating-bubble axis="xy" icon="clock" magnetic="x" @offset-change="onOffsetChange" />
   <!-- <a
@@ -46,6 +47,7 @@
 
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
+import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
 import { onMounted, ref, toRaw } from 'vue'
 const highLight = ref(false)
@@ -446,26 +448,6 @@ onMounted(() => {
         transition: all 0.3s;
         pointer-events: none;
       }
-      // .my_input_preffix_icon {
-      //   display: inline-block;
-      //   width: 10px;
-      //   height: 10px;
-      //   /* 这里我们换一种垂直对齐方式 */
-      //   /* 这里不设置line-height */
-      //   /* line-height: 40px; */
-      //   text-align: center;
-      //   font-size: smaller;
-      // }
-      // .my_input_preffix_icon:before {
-      //   color: rgb(0, 0, 0);
-      //   /* 设置高度 */
-      //   height: 80%;
-      //   /* 通过flex来垂直对齐before中的内容 */
-      //   display: flex;
-      //   align-items: center;
-      //   font-style: normal;
-      //   // font-family: 'Times New Roman', Times, serif;
-      // }
       input {
         width: 92%;
         height: 92%;

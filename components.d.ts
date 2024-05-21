@@ -10,6 +10,7 @@ declare module 'vue' {
     BottomNav: (typeof import('./src/components/BottomNav/index.vue'))['default']
     RouterLink: (typeof import('vue-router'))['RouterLink']
     RouterView: (typeof import('vue-router'))['RouterView']
+    SubmitButton: (typeof import('./src/components/SubmitButton/index.vue'))['default']
     VanBarrage: (typeof import('vant/es'))['Barrage']
     VanButton: (typeof import('vant/es'))['Button']
     VanFloatingBubble: (typeof import('vant/es'))['FloatingBubble']
