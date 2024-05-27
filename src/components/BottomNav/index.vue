@@ -1,8 +1,8 @@
 <template>
   <van-tabbar v-model="active" route>
-    <van-tabbar-item icon="home-o" to="/">填字</van-tabbar-item>
-    <van-tabbar-item icon="friends-o" to="/history">往期</van-tabbar-item>
-    <van-tabbar-item icon="search" to="/explore">探索</van-tabbar-item>
+    <van-tabbar-item icon="records-o" to="/">填字</van-tabbar-item>
+    <van-tabbar-item icon="browsing-history-o" to="/history">往期</van-tabbar-item>
+    <van-tabbar-item icon="fire-o" to="/explore">探索</van-tabbar-item>
     <van-tabbar-item icon="setting-o" to="/mine">我的</van-tabbar-item>
   </van-tabbar>
 </template>

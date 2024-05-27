@@ -7,17 +7,22 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    BottomNav: (typeof import('./src/components/BottomNav/index.vue'))['default']
-    RouterLink: (typeof import('vue-router'))['RouterLink']
-    RouterView: (typeof import('vue-router'))['RouterView']
-    SubmitButton: (typeof import('./src/components/SubmitButton/index.vue'))['default']
+    BottomNav: typeof import('./src/components/BottomNav/index.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
+    SubmitButton: typeof import('./src/components/SubmitButton/index.vue')['default']
     VanBarrage: (typeof import('vant/es'))['Barrage']
     VanButton: (typeof import('vant/es'))['Button']
-    VanFloatingBubble: (typeof import('vant/es'))['FloatingBubble']
-    VanNoticeBar: (typeof import('vant/es'))['NoticeBar']
+    VanCountDown: typeof import('vant/es')['CountDown']
+    VanFloatingBubble: typeof import('vant/es')['FloatingBubble']
+    VanFloatingPanel: (typeof import('vant/es'))['FloatingPanel']
+    VanGrid: (typeof import('vant/es'))['Grid']
+    VanGridItem: (typeof import('vant/es'))['GridItem']
+    VanImage: (typeof import('vant/es'))['Image']
+    VanNoticeBar: typeof import('vant/es')['NoticeBar']
     VanSearch: (typeof import('vant/es'))['Search']
     VanSpace: (typeof import('vant/es'))['Space']
-    VanTabbar: (typeof import('vant/es'))['Tabbar']
-    VanTabbarItem: (typeof import('vant/es'))['TabbarItem']
+    VanTabbar: typeof import('vant/es')['Tabbar']
+    VanTabbarItem: typeof import('vant/es')['TabbarItem']
   }
 }

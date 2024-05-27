@@ -33,16 +33,28 @@
         ></button>
       </div>
     </div>
+    <div class="header">第一期</div>
     <submit-button></submit-button>
   </div>
-  <van-floating-bubble axis="xy" icon="clock" magnetic="x" @offset-change="onOffsetChange" />
-  <!-- <a
-    href="https://beian.miit.gov.cn/"
-    style="position: fixed; bottom: 2px; left: calc(50% - 89px)"
-    target="_blank"
-    >京ICP备2024063915号-1</a
-  > -->
+  <van-floating-bubble
+    axis="xy"
+    icon="clock"
+    magnetic="x"
+    :offset="offset"
+    class="bubble"
+    @offset-change="onOffsetChange"
+  >
+    <template #default>
+      <van-count-down class="count-down" :time="time" format="HH:mm:ss" />
+    </template>
+  </van-floating-bubble>
   <bottom-nav></bottom-nav>
+  <a
+    href="https://beian.miit.gov.cn/"
+    style="position: fixed; bottom: 120px; left: calc(50% - 89px); z-index: 10000"
+    target="_blank"
+    >京ICP备2024068845号</a
+  >
 </template>
 
 <script setup lang="ts">
@@ -160,7 +172,7 @@ const heightLightInput = () => {
   // 自动选定第一个输入框元素，并设置样式
   const inputFirst = document.querySelector('input') as HTMLElement
   if (inputFirst) {
-    inputFirst.focus()
+    // inputFirst.focus()
     inputFirst.classList.add('highlight')
     inputFirst.style.borderColor = 'green'
     inputFirst.style.borderRadius = '1px'
@@ -408,6 +420,8 @@ const clickRightButton = () => {
   }
 }
 
+const offset = ref({ x: 303, y: 28 })
+const time = ref(2 * 60 * 60 * 1000)
 const onOffsetChange = (offset: { x: number; y: number }) => {
   showToast(`x: ${offset.x.toFixed(0)}, y: ${offset.y.toFixed(0)}`)
 }
@@ -426,10 +440,15 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   position: relative;
+  .header {
+    flex: 3;
+    text-align: center;
+    font-size: large;
+  }
 
   .fillin-col {
     display: flex;
-    flex: 2;
+    flex: 7;
     flex-direction: column;
     width: 100vw;
     height: auto;
@@ -511,19 +530,13 @@ onMounted(() => {
       }
     }
   }
-
-  // .highlight {
-  //   border-color: limegreen !important;
-  //   border-radius: 1px;
-  //   border-style: solid;
-  //   box-sizing: border-box;
-  // }
-  ::v-deep .van-icon-clock:before {
-    content: 'hh';
-  }
-
-  ::v-deep .van-notice-bar__wrap {
+  :deep(.van-notice-bar__wrap) {
     width: 100%;
   }
+}
+
+.count-down {
+  font-size: 11px;
+  color: white;
 }
 </style>
