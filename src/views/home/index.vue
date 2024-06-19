@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="header">第一期</div>
-    <submit-button></submit-button>
+    <!-- <submit-button></submit-button> -->
   </div>
   <van-floating-bubble
     axis="xy"
@@ -49,17 +49,11 @@
     </template>
   </van-floating-bubble>
   <bottom-nav></bottom-nav>
-  <a
-    href="https://beian.miit.gov.cn/"
-    style="position: fixed; bottom: 120px; left: calc(50% - 89px); z-index: 10000"
-    target="_blank"
-    >京ICP备2024068845号</a
-  >
 </template>
 
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
-import SubmitButton from '@/components/SubmitButton/index.vue'
+// import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
 import { onMounted, ref, toRaw } from 'vue'
 const highLight = ref(false)
