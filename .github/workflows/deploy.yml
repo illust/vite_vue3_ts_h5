@@ -18,7 +18,7 @@ jobs:
               with:
                   node-version: "20.9.0"  # 指定你的node版本
             - run: npm install
-            - run: npm run build
+            - run: npm run build:pro
             - name: TranslateFile
               # uses: wangyucode/sftp-upload-action@24f8bb83383dc39bed201ee5da01475e6c38c568
               uses: wangyucode/sftp-upload-action@v1.1
