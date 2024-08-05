@@ -21,7 +21,7 @@ jobs:
             - run: npm run build:pro
             - name: TranslateFile
               # uses: wangyucode/sftp-upload-action@24f8bb83383dc39bed201ee5da01475e6c38c568
-              uses: wangyucode/sftp-upload-action@v1.1
+              uses: garygrossgarten/github-action-scp@release
               with:
                   host: ${{ secrets.SERVER_IP }} #你的nginx服务器公网ip
                   port: "22" #你的nginx服务器ssh端口
