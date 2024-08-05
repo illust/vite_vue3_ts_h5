@@ -21,11 +21,13 @@ jobs:
             - run: npm run build:pro
             - name: TranslateFile
               # uses: wangyucode/sftp-upload-action@24f8bb83383dc39bed201ee5da01475e6c38c568
-              uses: garygrossgarten/github-action-scp@release
+              uses: cross-the-world/ssh-scp-ssh-pipelines@latest
               with:
                   host: ${{ secrets.SERVER_IP }} #你的nginx服务器公网ip
                   port: "22" #你的nginx服务器ssh端口
-                  username: ${{ secrets.USERNAME }} #你的nginx服务器用户名
-                  password: ${{ secrets.PASSWORD }} #你的nginx服务器密码
-                  local: "dist" #你vue项目build好的文件的路径,每次服务器上会自动删除对应的文件夹后重新覆盖
-                  remote: ${{ secrets.SERVER_DESTINATION }} #你要把你build好的文件夹放到nginx服务器上的什么位置，一般都是nginx配置的站点路径
+                  user: ${{ secrets.USERNAME }} #你的nginx服务器用户名
+                  pass: ${{ secrets.PASSWORD }} #你的nginx服务器密码
+                  scp: |
+                    ./dist/* => /usr/local/lighthoust/softwares/nginx/html/dist
+                  #localDir: "dist" #你vue项目build好的文件的路径,每次服务器上会自动删除对应的文件夹后重新覆盖
+                  #remoteDir: ${ secrets.SERVER_DESTINATION }} #你要把你build好的文件夹放到nginx服务器上的什么位置，一般都是nginx配置的站点路径
