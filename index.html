@@ -25,3 +25,15 @@
     box-sizing: border-box;
   }
 </style>
+<script>
+  (function(){
+      var href = origin = location.origin, pathname = location.pathname, search = location.search, hash = location.hash;
+      var searchs = search.replace(/_t_=[^&\?]*[&\?]*/g, '').replace(/(^[&\?]*)|([&\?]*$)/g, '');
+      if(localStorage.getItem('__clearcache__')) {
+          localStorage.removeItem('__clearcache__');
+          return history.replaceState({}, null, origin + pathname + (searchs ? '?' : '') + searchs + hash);
+      }
+      localStorage.setItem('__clearcache__', '1');
+      location.replace(origin + pathname + '?' + searchs + (searchs ? '&' : '') + '_t_=' + new Date().valueOf() + hash);
+  })()
+</script>

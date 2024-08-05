@@ -13,6 +13,8 @@ declare module 'vue' {
     SubmitButton: (typeof import('./src/components/SubmitButton/index.vue'))['default']
     VanBarrage: (typeof import('vant/es'))['Barrage']
     VanButton: (typeof import('vant/es'))['Button']
+    VanCell: (typeof import('vant/es'))['Cell']
+    VanCellGroup: (typeof import('vant/es'))['CellGroup']
     VanCountDown: (typeof import('vant/es'))['CountDown']
     VanFloatingBubble: (typeof import('vant/es'))['FloatingBubble']
     VanFloatingPanel: (typeof import('vant/es'))['FloatingPanel']
