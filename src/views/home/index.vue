@@ -505,8 +505,8 @@ onMounted(() => {
     }
 
     .middle-puz {
-      flex: 6;
-      height: 20%;
+      flex: 8;
+      height: 50%;
       // border: solid rgb(67, 117, 190) 2px;
     }
 
@@ -523,6 +523,10 @@ onMounted(() => {
         border: none !important;
       }
     }
+  }
+  :deep(.van-notice-bar) {
+    width: 100%;
+    padding: 6px !important;
   }
   :deep(.van-notice-bar__wrap) {
     width: 100%;
