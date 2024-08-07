@@ -58,6 +58,8 @@ import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
 import { onMounted, ref, toRaw } from 'vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const highLight = ref(false)
 const puzShow = ref('')
 
@@ -430,6 +432,7 @@ const onOffsetChange = (offset: { x: number; y: number }) => {
 
 onMounted(() => {
   console.log('wx', wx.miniProgram)
+  console.log('query', route.query)
   puzShow.value = rowPuzzles.value[0]
   disabledInput()
   heightLightInput()
