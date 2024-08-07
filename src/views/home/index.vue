@@ -42,6 +42,7 @@
     magnetic="x"
     :offset="offset"
     class="bubble"
+    @click="clickOnBubble"
     @offset-change="onOffsetChange"
   >
     <template #default>
@@ -53,6 +54,7 @@
 
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
+import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
 import { onMounted, ref, toRaw } from 'vue'
@@ -370,6 +372,12 @@ const onCompositionEnd = () => {
   console.log('compositionend')
 }
 
+const clickOnBubble = () => {
+  wx.miniProgram.navigateTo({
+    url: '/pages/login/index',
+  })
+}
+
 const rowPuzzles = ref([
   '1.辛弃疾《南乡子·登京口北固亭有怀》中的一句，上句为天下英雄谁敌手？曹刘。',
   '2.1905年谭鑫培主演的中国第一部电影。',
@@ -421,6 +429,7 @@ const onOffsetChange = (offset: { x: number; y: number }) => {
 }
 
 onMounted(() => {
+  console.log('wx', wx.miniProgram)
   puzShow.value = rowPuzzles.value[0]
   disabledInput()
   heightLightInput()
