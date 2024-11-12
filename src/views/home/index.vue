@@ -203,7 +203,7 @@ const heightLightInput = () => {
           spans[i].parentNode.removeChild(spans[i])
         }
       }
-      // 相邻两次点击不是同一个input
+      // 相邻两次点击不是同一组input
       if (e.target.classList[0] !== lastClickedInput) {
         inputDirection.value = true
         lastClickedInput = e.target.classList[0]
@@ -411,16 +411,26 @@ const colPuzzles = ref([
 ])
 
 const clickLeftButton = () => {
-  if (puzShow.value !== rowPuzzles.value[0]) {
-    const index = rowPuzzles.value.indexOf(puzShow.value)
-    puzShow.value = rowPuzzles.value[index - 1]
+  if (inputDirection.value) {
+    if (puzShow.value !== rowPuzzles.value[0]) {
+      const index = rowPuzzles.value.indexOf(puzShow.value)
+      puzShow.value = rowPuzzles.value[index - 1]
+    }
+  } else if (puzShow.value !== colPuzzles.value[0]) {
+    const index = colPuzzles.value.indexOf(puzShow.value)
+    puzShow.value = colPuzzles.value[index - 1]
   }
 }
 
 const clickRightButton = () => {
-  if (puzShow.value !== rowPuzzles.value[9]) {
-    const index = rowPuzzles.value.indexOf(puzShow.value)
-    puzShow.value = rowPuzzles.value[index + 1]
+  if (inputDirection.value) {
+    if (puzShow.value !== rowPuzzles.value[rowPuzzles.value.length - 1]) {
+      const index = rowPuzzles.value.indexOf(puzShow.value)
+      puzShow.value = rowPuzzles.value[index + 1]
+    }
+  } else if (puzShow.value !== colPuzzles.value[colPuzzles.value.length - 1]) {
+    const index = colPuzzles.value.indexOf(puzShow.value)
+    puzShow.value = colPuzzles.value[index + 1]
   }
 }
 
