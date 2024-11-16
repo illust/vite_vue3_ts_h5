@@ -203,6 +203,7 @@ const heightLightInput = () => {
           spans[i].parentNode.removeChild(spans[i])
         }
       }
+
       // 相邻两次点击不是同一组input
       if (e.target.classList[0] !== lastClickedInput) {
         inputDirection.value = true
@@ -231,6 +232,7 @@ const heightLightInput = () => {
         }
       }
       removeLastInputsBackground(lastInputsArray)
+      removeLastInputsBackground(lastClickArray.value)
       setCurrInputsBackground(adjInputsArray.value)
 
       if (inputDirection.value) {
@@ -260,6 +262,7 @@ const heightLightInput = () => {
         i.classList.remove('highlight')
         i.style.border = 'none'
       })
+      console.log('inputt', input)
       // 给当前点击的输入框添加高亮样式
       input.classList.add('highlight')
       // 设置高亮样式的边框属性
@@ -410,27 +413,212 @@ const colPuzzles = ref([
   '十一、唐代韦应物《秋夜寄邱员外》中的一句，下句为幽人应未眠。',
 ])
 
+const lastClickArray = ref<string[]>([])
+
 const clickLeftButton = () => {
+  let lastInputsArray: any = adjInputsArray.value
   if (inputDirection.value) {
+    // 输入方向为横向
     if (puzShow.value !== rowPuzzles.value[0]) {
+      // 遍历这些元素(词语序号)，并逐个删除
+      const spans = document.getElementsByClassName('my_input_preffix')
+      if (spans) {
+        for (let i = spans.length - 1; i >= 0; i--) {
+          spans[i].parentNode.removeChild(spans[i])
+        }
+      }
+
       const index = rowPuzzles.value.indexOf(puzShow.value)
+      const coorIndies = horInputNumInx.value[index - 1] // ".r1-c1"
+      const [rowIndex, colIndex] = coorIndies.match(/\d+/g).map(Number)
+      adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, true)
+      removeLastInputsBackground(lastInputsArray)
+      setCurrInputsBackground(adjInputsArray.value)
+      curNumIndex.value = (horInputNumInx.value.indexOf(adjInputsArray.value[0]) + 1).toString()
+
+      const el = document.querySelector(adjInputsArray.value[0])
+      const elNew = document.createElement('span')
+      elNew.setAttribute('class', 'my_input_preffix')
+      elNew.style.position = 'absolute'
+      elNew.style.marginLeft = '3px'
+      elNew.style.marginTop = '3px'
+      elNew.style.fontSize = '12px'
+      elNew.innerHTML = curNumIndex.value
+      el?.parentNode?.insertBefore(elNew, el)
+
+      console.log('adjInputsArray.value', toRaw(adjInputsArray.value))
+
+      lastInputsArray = adjInputsArray.value
+      lastClickArray.value = adjInputsArray.value
+
+      // 移除所有输入框的高亮样式
+      const inputs = document.querySelectorAll('input')
+      inputs.forEach((i) => {
+        i.classList.remove('highlight')
+        i.style.border = 'none'
+      })
+      // 给每组词语的第一个输入框添加高亮
+      const inputEl = document.querySelector(coorIndies)
+      inputEl.classList.add('highlight')
+      // 设置高亮样式的边框属性
+      inputEl.style.borderColor = 'green'
+      inputEl.style.borderRadius = '1px'
+      inputEl.style.borderStyle = 'solid'
+
       puzShow.value = rowPuzzles.value[index - 1]
     }
   } else if (puzShow.value !== colPuzzles.value[0]) {
+    // 遍历这些元素(词语序号)，并逐个删除
+    const spans = document.getElementsByClassName('my_input_preffix')
+    if (spans) {
+      for (let i = spans.length - 1; i >= 0; i--) {
+        spans[i].parentNode.removeChild(spans[i])
+      }
+    }
+
     const index = colPuzzles.value.indexOf(puzShow.value)
+    const coorIndies = verInputNumInx.value[index - 1] // ".r1-c1"
+    const [rowIndex, colIndex] = coorIndies.match(/\d+/g).map(Number)
+    adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, false)
+    removeLastInputsBackground(lastInputsArray)
+    setCurrInputsBackground(adjInputsArray.value)
+    curNumIndex.value = numHanzi.value[verInputNumInx.value.indexOf(adjInputsArray.value[0])]
+
+    const el = document.querySelector(adjInputsArray.value[0])
+    const elNew = document.createElement('span')
+    elNew.setAttribute('class', 'my_input_preffix')
+    elNew.style.position = 'absolute'
+    elNew.style.marginLeft = '3px'
+    elNew.style.marginTop = '3px'
+    elNew.style.fontSize = '12px'
+    elNew.innerHTML = curNumIndex.value
+    el?.parentNode?.insertBefore(elNew, el)
+
+    console.log('adjInputsArray.value', toRaw(adjInputsArray.value))
+
+    lastInputsArray = adjInputsArray.value
+    lastClickArray.value = adjInputsArray.value
+
+    // 移除所有输入框的高亮样式
+    const inputs = document.querySelectorAll('input')
+    inputs.forEach((i) => {
+      i.classList.remove('highlight')
+      i.style.border = 'none'
+    })
+
+    // 给每组词语的第一个输入框添加高亮
+    const inputEl = document.querySelector(coorIndies)
+    inputEl.classList.add('highlight')
+    // 设置高亮样式的边框属性
+    inputEl.style.borderColor = 'green'
+    inputEl.style.borderRadius = '1px'
+    inputEl.style.borderStyle = 'solid'
+
     puzShow.value = colPuzzles.value[index - 1]
   }
 }
 
 const clickRightButton = () => {
+  let lastInputsArray: any = adjInputsArray.value
   if (inputDirection.value) {
     if (puzShow.value !== rowPuzzles.value[rowPuzzles.value.length - 1]) {
-      const index = rowPuzzles.value.indexOf(puzShow.value)
-      puzShow.value = rowPuzzles.value[index + 1]
+      // 遍历这些元素(词语序号)，并逐个删除
+      const spans = document.getElementsByClassName('my_input_preffix')
+      if (spans) {
+        for (let i = spans.length - 1; i >= 0; i--) {
+          spans[i].parentNode.removeChild(spans[i])
+        }
+      }
+
+      const index = rowPuzzles.value.indexOf(puzShow.value) + 1
+      console.log('indexx', index)
+      const coorIndies = horInputNumInx.value[index] // ".r1-c1"
+      console.log('🚀 ~ clickRightButton ~ coorIndies:', coorIndies)
+      const [rowIndex, colIndex] = coorIndies.match(/\d+/g).map(Number) //[1,1]
+      adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, true)
+      removeLastInputsBackground(lastInputsArray)
+      setCurrInputsBackground(adjInputsArray.value)
+      curNumIndex.value = (horInputNumInx.value.indexOf(adjInputsArray.value[0]) + 1).toString()
+
+      const el = document.querySelector(adjInputsArray.value[0])
+      const elNew = document.createElement('span')
+      elNew.setAttribute('class', 'my_input_preffix')
+      elNew.style.position = 'absolute'
+      elNew.style.marginLeft = '3px'
+      elNew.style.marginTop = '3px'
+      elNew.style.fontSize = '12px'
+      elNew.innerHTML = curNumIndex.value
+      el?.parentNode?.insertBefore(elNew, el)
+
+      console.log('adjInputsArray.value', toRaw(adjInputsArray.value))
+
+      lastInputsArray = adjInputsArray.value
+      lastClickArray.value = adjInputsArray.value
+
+      // 移除所有输入框的高亮样式
+      const inputs = document.querySelectorAll('input')
+      inputs.forEach((i) => {
+        i.classList.remove('highlight')
+        i.style.border = 'none'
+      })
+      // 给每组词语的第一个输入框添加高亮
+      const inputEl = document.querySelector(coorIndies)
+      inputEl.classList.add('highlight')
+      // 设置高亮样式的边框属性
+      inputEl.style.borderColor = 'green'
+      inputEl.style.borderRadius = '1px'
+      inputEl.style.borderStyle = 'solid'
+
+      puzShow.value = rowPuzzles.value[index]
     }
   } else if (puzShow.value !== colPuzzles.value[colPuzzles.value.length - 1]) {
-    const index = colPuzzles.value.indexOf(puzShow.value)
-    puzShow.value = colPuzzles.value[index + 1]
+    // 遍历这些元素(词语序号)，并逐个删除
+    const spans = document.getElementsByClassName('my_input_preffix')
+    if (spans) {
+      for (let i = spans.length - 1; i >= 0; i--) {
+        spans[i].parentNode.removeChild(spans[i])
+      }
+    }
+    const index = colPuzzles.value.indexOf(puzShow.value) + 1
+
+    const coorIndies = verInputNumInx.value[index] // ".r1-c1"
+    const [rowIndex, colIndex] = coorIndies.match(/\d+/g).map(Number)
+    adjInputsArray.value = getAdjInputsArray(rowIndex, colIndex, false)
+    removeLastInputsBackground(lastInputsArray)
+    setCurrInputsBackground(adjInputsArray.value)
+    curNumIndex.value = numHanzi.value[verInputNumInx.value.indexOf(adjInputsArray.value[0])]
+
+    const el = document.querySelector(adjInputsArray.value[0])
+    const elNew = document.createElement('span')
+    elNew.setAttribute('class', 'my_input_preffix')
+    elNew.style.position = 'absolute'
+    elNew.style.marginLeft = '3px'
+    elNew.style.marginTop = '3px'
+    elNew.style.fontSize = '12px'
+    elNew.innerHTML = curNumIndex.value
+    el?.parentNode?.insertBefore(elNew, el)
+
+    console.log('adjInputsArray.value', toRaw(adjInputsArray.value))
+
+    lastInputsArray = adjInputsArray.value
+    lastClickArray.value = adjInputsArray.value
+
+    // 移除所有输入框的高亮样式
+    const inputs = document.querySelectorAll('input')
+    inputs.forEach((i) => {
+      i.classList.remove('highlight')
+      i.style.border = 'none'
+    })
+
+    // 给每组词语的第一个输入框添加高亮
+    const inputEl = document.querySelector(coorIndies)
+    inputEl.classList.add('highlight')
+    // 设置高亮样式的边框属性
+    inputEl.style.borderColor = 'green'
+    inputEl.style.borderRadius = '1px'
+    inputEl.style.borderStyle = 'solid'
+
+    puzShow.value = colPuzzles.value[index]
   }
 }
 
