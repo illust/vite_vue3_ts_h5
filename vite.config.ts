@@ -1,11 +1,11 @@
+import { VantResolver } from '@vant/auto-import-resolver'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import autoImport from 'unplugin-auto-import/vite'
+import components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
 import viteCompression from 'vite-plugin-compression'
-import components from 'unplugin-vue-components/vite'
-import { VantResolver } from '@vant/auto-import-resolver'
 import VueSetupExtend from 'vite-plugin-vue-setup-extend'
-import autoImport from 'unplugin-auto-import/vite'
 
 import postcsspxtoviewport from 'postcss-px-to-viewport'
 
@@ -63,7 +63,15 @@ export default defineConfig({
     port: 8088,
     open: true,
     https: false,
-    proxy: {},
+    proxy: {
+      // https://cn.vitejs.dev/config/#server-proxy
+      '/api': {
+        // target: 'http://192.168.3.38:8080',
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api/, ''),
+      },
+    },
   },
   // 生产环境打包配置
   // 去除console debugger

@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
+import { getAccessToken, getPhoneNumber } from '@/service/api/getPhoneNumber'
 import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
@@ -360,7 +361,7 @@ const removeLastInputsBackground = (arr: string[]): any => {
 const inputValue = ref('') // 连续输入中文
 const inputChange = (e: { target: { value: any } }) => {
   inputValue.value = e.target.value
-
+  console.log('inputValue.value', inputValue.value)
   const inputIndex = toRaw(adjInputsArray.value).indexOf(currInput.value)
   console.log('input', e.target.value)
   console.log('inputIndex', inputIndex)
@@ -628,9 +629,12 @@ const onOffsetChange = (offset: { x: number; y: number }) => {
   showToast(`x: ${offset.x.toFixed(0)}, y: ${offset.y.toFixed(0)}`)
 }
 
-onMounted(() => {
-  console.log('wx', wx.miniProgram)
-  console.log('query', route.query)
+onMounted(async () => {
+  // console.log('wx', wx.miniProgram)
+  console.log('query.code', route.query.code)
+  await getAccessToken()
+  await getPhoneNumber(route.query.code)
+
   puzShow.value = rowPuzzles.value[0]
   disabledInput()
   heightLightInput()

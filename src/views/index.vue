@@ -6,20 +6,21 @@
 </template>
 <script setup lang="ts">
 import { onMounted } from 'vue'
+interface Box {
+  x: number
+  y: number
+  content: string
+  isSelected: boolean
+}
 onMounted(() => {
-  const canvas = <HTMLCanvasElement>document.getElementById('inputCanvas')
-  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d')
-  const hiddenInput = <HTMLElement>document.getElementById('hiddenInput')
+  const canvas = document.getElementById('inputCanvas') as HTMLCanvasElement
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  const hiddenInput = document.getElementById('hiddenInput') as HTMLElement
 
   const boxWidth = 50 // 每个输入框宽度
   const boxHeight = 50 // 每个输入框高度
   const boxMargin = 2 // 输入框间隔
-  const boxes: {
-    x(x: any, y: any, boxWidth: number, boxHeight: number): unknown
-    y(x: any, y: any, boxWidth: number, boxHeight: number): unknown
-    content(content: any, arg1: any, arg2: any): unknown
-    isSelected: boolean
-  }[] = [] // 存储输入框的位置及内容
+  const boxes: Box[] = [] // 存储输入框的位置及内容
 
   // 初始化输入框数据
   for (let i = 0; i < 15; i++) {
@@ -138,14 +139,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-    canvas {
-      border: 1px solid black;
-      display: block;
-      margin: 20px auto;
-    }
-    input.hidden-input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
+canvas {
+  border: 1px solid black;
+  display: block;
+  margin: 20px auto;
+}
+input.hidden-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
 </style>
