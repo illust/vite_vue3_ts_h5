@@ -33,7 +33,7 @@
         ></button>
       </div>
     </div>
-    <div class="header">第一期</div>
+    <div class="header">{{ userInfo.userName }}</div>
     <!-- <submit-button></submit-button> -->
   </div>
   <van-floating-bubble
@@ -54,15 +54,27 @@
 
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
-import { getAccessToken, getPhoneNumber } from '@/service/api/getPhoneNumber'
+import { getAccessToken, getPhoneNumber, getUserInfo } from '@/service/api/getPhoneNumber'
+import { usePageStore } from '@/store'
 import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
-import { onMounted, ref, toRaw } from 'vue'
+import {
+  onActivated,
+  onBeforeMount,
+  onBeforeUnmount,
+  onBeforeUpdate,
+  onMounted,
+  onUnmounted,
+  onUpdated,
+  ref,
+  toRaw,
+} from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const highLight = ref(false)
 const puzShow = ref('')
+const pageStore = usePageStore()
 
 // 固定位置input置为disabled,黑色输入框
 const disabledInputIndies = ref([
@@ -629,15 +641,73 @@ const onOffsetChange = (offset: { x: number; y: number }) => {
   showToast(`x: ${offset.x.toFixed(0)}, y: ${offset.y.toFixed(0)}`)
 }
 
+interface UserInfo {
+  id: number
+  userName: string
+  phoneNumber: string
+  createdAt: string
+  updatedAt: string
+}
+const userInfo = ref<UserInfo>({
+  id: 0,
+  userName: '',
+  phoneNumber: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
 onMounted(async () => {
+  console.log('mounted pageStore.phoneNumber', pageStore.phoneNumber)
+  if (!pageStore.phoneNumber.length) {
+    try {
+      await getAccessToken()
+      pageStore.phoneNumber = await getPhoneNumber(route.query.code)
+      localStorage.setItem('phoneNumber', pageStore.phoneNumber.phoneNumber)
+      userInfo.value = await getUserInfo({ ...pageStore.phoneNumber })
+    } catch (error) {
+      // 处理请求错误
+      console.error(error)
+    }
+  }
   // console.log('wx', wx.miniProgram)
-  console.log('query.code', route.query.code)
-  await getAccessToken()
-  await getPhoneNumber(route.query.code)
+  // console.log('query.code', route.query.code)
 
   puzShow.value = rowPuzzles.value[0]
   disabledInput()
   heightLightInput()
+})
+
+onActivated(async () => {
+  const storedPhoneNumber = localStorage.getItem('phoneNumber')
+  if (!storedPhoneNumber) {
+    try {
+      userInfo.value = await getUserInfo({ storedPhoneNumber })
+    } catch (error) {
+      // 处理请求错误
+      console.error(error)
+    }
+  }
+  console.log('activated storedPhoneNumber', storedPhoneNumber)
+})
+
+onBeforeMount(() => {
+  console.log('beforeMount')
+})
+
+onBeforeUpdate(() => {
+  console.log('beforeUpdate')
+})
+
+onUpdated(() => {
+  console.log('updated')
+})
+
+onBeforeUnmount(() => {
+  console.log('beforeUnmount')
+})
+
+onUnmounted(() => {
+  console.log('unmounted')
 })
 </script>
 

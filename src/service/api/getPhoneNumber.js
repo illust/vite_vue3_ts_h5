@@ -36,3 +36,19 @@ export function getPhoneNumber(code) {
     data: data,
   })
 }
+
+// 通过手机号获取用户信息
+export function getUserInfo(phone) {
+  const data = {
+    ...phone,
+  }
+  return request({
+    url: '/api/user/find-by-phone-number',
+    headers: {
+      isToken: false,
+      repeatSubmit: false,
+    },
+    method: 'post',
+    data: data,
+  })
+}
