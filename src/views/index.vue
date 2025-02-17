@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <canvas id="inputCanvas" width="1300" height="100"></canvas>
+    <canvas id="inputCanvas" width="1300" height="200"></canvas>
     <input id="hiddenInput" type="text" class="hidden-input" />
   </div>
 </template>
@@ -85,7 +85,7 @@ onMounted(() => {
   hiddenInput.addEventListener('input', () => {
     const input = hiddenInput.value
     const chineseChars = input.match(/[\u4e00-\u9fa5]/g) // 提取中文汉字
-
+    console.log('chineseChars', chineseChars)
     if (chineseChars) {
       chineseChars.forEach((char: any) => {
         if (activeBox < boxes.length) {
