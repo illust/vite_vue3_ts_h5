@@ -29,6 +29,7 @@
     "js-cookie": "^3.0.5",
     "nprogress": "^0.2.0",
     "pinia": "^2.3.0",
+    "pixi.js": "^8.6.6",
     "prettier": "^3.2.5",
     "sass": "^1.75.0",
     "three": "^0.176.0",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
+    "@types/three": "^0.171.0",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "@vant/auto-import-resolver": "^1.1.0",

@@ -5,7 +5,7 @@
         <div v-for="c in 10" :key="c" style="width: 9.95%">
           <input
             type="text"
-            maxlength="10"
+            maxlength="1"
             :class="[highLight ? 'highlight' : '', `r${r}-c${c}`]"
             @input="inputChange"
             @compositionstart="onCompositionStart"
@@ -677,18 +677,18 @@ onMounted(async () => {
   heightLightInput()
 })
 
-onActivated(async () => {
-  const storedPhoneNumber = localStorage.getItem('phoneNumber')
-  if (!storedPhoneNumber) {
-    try {
-      userInfo.value = await getUserInfo({ storedPhoneNumber })
-    } catch (error) {
-      // 处理请求错误
-      console.error(error)
-    }
-  }
-  console.log('activated storedPhoneNumber', storedPhoneNumber)
-})
+// onActivated(async () => {
+//   const storedPhoneNumber = localStorage.getItem('phoneNumber')
+//   if (!storedPhoneNumber) {
+//     try {
+//       userInfo.value = await getUserInfo({ storedPhoneNumber })
+//     } catch (error) {
+//       // 处理请求错误
+//       console.error(error)
+//     }
+//   }
+//   console.log('activated storedPhoneNumber', storedPhoneNumber)
+// })
 
 onBeforeMount(() => {
   console.log('beforeMount')
