@@ -54,22 +54,14 @@
 
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
-import { getAccessToken, getPhoneNumber, getUserInfo } from '@/service/api/getPhoneNumber'
+import { getAccessToken, getPhoneNumber, getUserInfo } from '@/service/api/miniprog/getPhoneNumber'
+import { getPuzzles } from '@/service/api/puzzle/getPuzzles'
 import { usePageStore } from '@/store'
+import { cntChineseChars, transPuzzlePosition, findMissingCoordinates } from '@/utils/transform'
 import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
-import {
-  onActivated,
-  onBeforeMount,
-  onBeforeUnmount,
-  onBeforeUpdate,
-  onMounted,
-  onUnmounted,
-  onUpdated,
-  ref,
-  toRaw,
-} from 'vue'
+import { onMounted, ref, toRaw } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const highLight = ref(false)
@@ -151,7 +143,26 @@ const verInputNumInx = ref([
   '.r1-c9',
   '.r2-c10',
 ])
-const numHanzi = ref(['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一'])
+const numHanzi = ref([
+  '一',
+  '二',
+  '三',
+  '四',
+  '五',
+  '六',
+  '七',
+  '八',
+  '九',
+  '十',
+  '十一',
+  '十二',
+  '十三',
+  '十四',
+  '十五',
+  '十六',
+  '十七',
+  '十八',
+])
 const curNumIndex = ref('')
 
 const disabledInput = () => {
@@ -177,18 +188,26 @@ const disabledInput = () => {
  */
 const inputDirection = ref(true) // 输入方向：true:横向 false:纵向
 const currInput = ref('')
+const inputFirstLoc = ref('')
 const adjInputsArray = ref<string[]>([]) // 邻接输入框坐标数组
 
 const heightLightInput = () => {
-  // 自动选定第一个输入框元素，并设置样式
-  const inputFirst = document.querySelector('input') as HTMLElement
+  // 自动选定横向第一个词语的第一个汉字输入框元素，并设置样式
+  const row = parseInt(inputFirstLoc.value.split('.')[1].split('-')[0].slice(1))
+  const col = parseInt(inputFirstLoc.value.split('.')[1].split('-')[1].slice(1))
+  console.log('inputFirstLoc', row, col)
+  const inputFirst = document
+    .querySelector(`.fillin-col .fillin-row:nth-child(${row}) > div:nth-child(${col})`)
+    ?.querySelector('input') as HTMLElement
+  console.log("inputFirst", inputFirst);
+  
   if (inputFirst) {
     // inputFirst.focus()
     inputFirst.classList.add('highlight')
     inputFirst.style.borderColor = 'green'
     inputFirst.style.borderRadius = '1px'
     inputFirst.style.borderStyle = 'solid'
-    adjInputsArray.value = getAdjInputsArray(1, 1, true)
+    adjInputsArray.value = getAdjInputsArray(row, col, true)
     setCurrInputsBackground(adjInputsArray.value)
 
     const elNew = document.createElement('span')
@@ -396,35 +415,8 @@ const clickOnBubble = () => {
   })
 }
 
-const rowPuzzles = ref([
-  '1.辛弃疾《南乡子·登京口北固亭有怀》中的一句，上句为天下英雄谁敌手？曹刘。',
-  '2.1905年谭鑫培主演的中国第一部电影。',
-  '3.2022年6月17日下水的我国第三艘航空母舰的名字。',
-  '4.湖北省宜昌市下辖区。区内有三峡人家、三峡大坝等旅游景点。',
-  '5.一年生草本植物，是人类最早使用的天然植物纤维。具有吸汗、透气性良好和对人体无害等特点。',
-  '6.由罗维执导，李小龙主演的影片。',
-  '7.蔡依林演唱的歌曲。翻唱自BWO空壳乐队的歌曲Sunshine in the Rain。崔惟楷填词。',
-  '8.中国香港的一个渡轮码头，位于香港岛湾仔海旁，邻近香港会议展览中心。',
-  '9.巴西职业足球运动员罗纳尔多的绰号。',
-  '10.将宽度不等的多个黑条和空白，按照一定的编码规则排列，用以表达一组信息的图形标识符。',
-  '11.中国台湾男歌手、音乐人。代表作《我很丑，可是我很温柔》《我是一只小小鸟》《爱要怎么说出口》《给所有知道我名字的人》。',
-  '12.足球比赛中，轨迹怪异到让门将都没办法的进球。',
-  '13.河北省辖县级市，以金丝小枣、鸭梨、驴肉火烧闻名。',
-  '14.一家意大利汽车生产商，全球顶级跑车制造商。标志是一头充满力量的斗牛。',
-])
-const colPuzzles = ref([
-  '一、生物体生命活动的内在节律性，由生物体内的时间结构序所决定。',
-  '二、一种高级煤，具有明亮的金属光泽。密度比较大，可雕刻加工。',
-  '三、由尚敬执导，闫妮、沙溢、姚晨、喻恩泰、姜超、王莎莎等主演的章回体古装情景喜剧。',
-  '四、由加布里尔·穆奇诺执导，威尔·史密斯、贾登·史密斯、桑迪·牛顿等主演的电影。',
-  '五、当代作家梁晓声创作的长篇小说，获第十届茅盾文学奖。',
-  '六、由王万东、焦晓雨执导，范志博、胡可、黑子主演的军事题材电视剧。',
-  '七、欧洲中部国家，首都华沙。',
-  '八、明万历皇帝及皇后陵寝，位于北京市昌平区大峪山东麓。',
-  '九、新闻资讯客户端，北京字节跳动科技有限公司开发。',
-  '十、中国内地男演员，出演《蓝宇》《天龙八部》。',
-  '十一、唐代韦应物《秋夜寄邱员外》中的一句，下句为幽人应未眠。',
-])
+const rowPuzzles = ref<string[]>([])
+const colPuzzles = ref<string[]>([])
 
 const lastClickArray = ref<string[]>([])
 
@@ -669,45 +661,50 @@ onMounted(async () => {
       console.error(error)
     }
   }
-  // console.log('wx', wx.miniProgram)
+  const puzzles = await getPuzzles(2)
+  const horPuzzlesLoc: Array<string> = []
+  const verPuzzlesLoc: Array<string> = []
+  const textBlocksLoc: Set<string> = new Set()
+
+  const acrossClues: Array<{ [key: string]: any }> = puzzles.across_clues
+  acrossClues.forEach((item: { [key: string]: any }) => {
+    horPuzzlesLoc.push(transPuzzlePosition(item.location))
+    rowPuzzles.value.push(item.clue)
+    textBlocksLoc.add(item.location)
+    let beginIndex = parseInt(item.location.split(',')[1])
+    const cnt = cntChineseChars(item.answer)
+    const endIndex = beginIndex + cnt
+    for (beginIndex; beginIndex < endIndex; beginIndex++) {
+      textBlocksLoc.add(item.location.split(',')[0] + ',' + beginIndex.toString())
+      // console.log('beginIndex', beginIndex)
+    }
+  })
+  const downClues: Array<{ [key: string]: any }> = puzzles.down_clues
+  downClues.forEach((item: { [key: string]: any }) => {
+    verPuzzlesLoc.push(transPuzzlePosition(item.location))
+    colPuzzles.value.push(item.clue)
+    textBlocksLoc.add(item.location)
+    let beginIndex = parseInt(item.location.split(',')[0])
+    const cnt = cntChineseChars(item.answer)
+    const endIndex = beginIndex + cnt
+    for (beginIndex; beginIndex < endIndex; beginIndex++) {
+      textBlocksLoc.add(beginIndex.toString() + ',' + item.location.split(',')[1])
+    }
+  })
+  console.log('horPuzzlesLoc,verPuzzlesLoc', horPuzzlesLoc, verPuzzlesLoc)
+  const disabledInpt = findMissingCoordinates(textBlocksLoc)
+  console.log('disabledInpt', disabledInpt)
+  disabledInputIndies.value = disabledInpt.map((item: any) => transPuzzlePosition(item))
+  console.log('disabledInputIndies', disabledInputIndies.value)
+  horInputNumInx.value = horPuzzlesLoc
+  verInputNumInx.value = verPuzzlesLoc
+
   // console.log('query.code', route.query.code)
 
   puzShow.value = rowPuzzles.value[0]
+  inputFirstLoc.value = horPuzzlesLoc[0]
   disabledInput()
   heightLightInput()
-})
-
-// onActivated(async () => {
-//   const storedPhoneNumber = localStorage.getItem('phoneNumber')
-//   if (!storedPhoneNumber) {
-//     try {
-//       userInfo.value = await getUserInfo({ storedPhoneNumber })
-//     } catch (error) {
-//       // 处理请求错误
-//       console.error(error)
-//     }
-//   }
-//   console.log('activated storedPhoneNumber', storedPhoneNumber)
-// })
-
-onBeforeMount(() => {
-  console.log('beforeMount')
-})
-
-onBeforeUpdate(() => {
-  console.log('beforeUpdate')
-})
-
-onUpdated(() => {
-  console.log('updated')
-})
-
-onBeforeUnmount(() => {
-  console.log('beforeUnmount')
-})
-
-onUnmounted(() => {
-  console.log('unmounted')
 })
 </script>
 
