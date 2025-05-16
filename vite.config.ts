@@ -83,4 +83,5 @@ export default defineConfig({
       },
     },
   },
+  extensions: ['.js', '.ts', '.tsx', '.jsx'],
 })

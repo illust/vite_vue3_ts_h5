@@ -25,17 +25,17 @@ import { onMounted, ref } from 'vue'
 const confettiAmount = ref(100)
 const confettiColors = ref(['#7d32f5', '#f6e434', '#63fdf1', '#e672da', '#295dfe', '#6e57ff'])
 
-const random = (min, max) => {
+const random = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
-const createConfetti = (to) => {
+const createConfetti = (to: Element) => {
   const elem = document.createElement('i'),
-    set = Math.random() < 0.5 ? -1 : 1
+  set = Math.random() < 0.5 ? -1 : 1
   elem.style.setProperty('--x', random(-360, 360) + 'px')
   elem.style.setProperty('--y', random(-200, 200) + 'px')
   elem.style.setProperty('--r', random(0, 360) + 'deg')
-  elem.style.setProperty('--s', random(0.6, 1))
-  elem.style.setProperty('--b', confettiColors[random(0, 5)])
+  elem.style.setProperty('--s', random(0.6, 1).toString())
+  elem.style.setProperty('--b', confettiColors.value[random(0, 5)])
   to.appendChild(elem)
 }
 

@@ -35,6 +35,15 @@
     </div>
     <div class="header">{{ userInfo.userName }}</div>
     <!-- <submit-button></submit-button> -->
+    <div class="submit-button">
+      <van-button
+        type="primary"
+        class="submit-btn"
+        style="width: 100px; height: 40px; position: absolute; bottom: 120px"
+        @click="submitPuzzles"
+        >提交</van-button
+      >
+    </div>
   </div>
   <van-floating-bubble
     axis="xy"
@@ -55,13 +64,13 @@
 <script setup lang="ts">
 import BottomNav from '@/components/BottomNav/index.vue'
 import { getAccessToken, getPhoneNumber, getUserInfo } from '@/service/api/miniprog/getPhoneNumber'
-import { getPuzzles } from '@/service/api/puzzle/getPuzzles'
+import { getPuzzles, postSubmitPuzzles } from '@/service/api/puzzle/getPuzzles'
 import { usePageStore } from '@/store'
 import { cntChineseChars, transPuzzlePosition, findMissingCoordinates } from '@/utils/transform'
 import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
-import { onMounted, ref, toRaw } from 'vue'
+import { onMounted, Ref, ref, toRaw } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const highLight = ref(false)
@@ -69,80 +78,10 @@ const puzShow = ref('')
 const pageStore = usePageStore()
 
 // 固定位置input置为disabled,黑色输入框
-const disabledInputIndies = ref([
-  '.r1-c8',
-  '.r1-c10',
-  '.r2-c2',
-  '.r2-c4',
-  '.r2-c5',
-  '.r2-c6',
-  '.r2-c7',
-  '.r3-c2',
-  '.r3-c6',
-  '.r3-c9',
-  '.r4-c1',
-  '.r4-c2',
-  '.r4-c4',
-  '.r4-c6',
-  '.r4-c7',
-  '.r4-c8',
-  '.r4-c9',
-  '.r5-c2',
-  '.r5-c4',
-  '.r5-c7',
-  '.r5-c9',
-  '.r6-c4',
-  '.r6-c6',
-  '.r6-c7',
-  '.r7-c1',
-  '.r7-c3',
-  '.r7-c4',
-  '.r7-c9',
-  '.r7-c10',
-  '.r8-c1',
-  '.r8-c5',
-  '.r8-c6',
-  '.r8-c7',
-  '.r9-c3',
-  '.r9-c7',
-  '.r9-c8',
-  '.r9-c9',
-  '.r9-c10',
-  '.r10-c1',
-  '.r10-c2',
-  '.r10-c5',
-  '.r10-c10',
-])
+const disabledInputIndies = ref([])
 // 水平、竖直方向输入框数字标识索引数组
-const horInputNumInx = ref([
-  '.r1-c1',
-  '.r2-c8',
-  '.r3-c3',
-  '.r3-c7',
-  '.r5-c5',
-  '.r6-c1',
-  '.r6-c8',
-  '.r7-c5',
-  '.r8-c2',
-  '.r8-c8',
-  '.r9-c1',
-  '.r9-c4',
-  '.r10-c3',
-  '.r10-c6',
-])
-const verInputNumInx = ref([
-  '.r1-c1',
-  '.r5-c1',
-  '.r6-c2',
-  '.r1-c3',
-  '.r8-c4',
-  '.r3-c5',
-  '.r9-c6',
-  '.r2-c8',
-  '.r5-c8',
-  '.r1-c9',
-  '.r2-c10',
-])
+const horInputNumInx = ref([])
+const verInputNumInx = ref([])
 const numHanzi = ref([
   '一',
   '二',
@@ -199,8 +138,8 @@ const heightLightInput = () => {
   const inputFirst = document
     .querySelector(`.fillin-col .fillin-row:nth-child(${row}) > div:nth-child(${col})`)
     ?.querySelector('input') as HTMLElement
-  console.log("inputFirst", inputFirst);
-  
+  console.log('inputFirst', inputFirst)
+
   if (inputFirst) {
     // inputFirst.focus()
     inputFirst.classList.add('highlight')
@@ -648,6 +587,45 @@ const userInfo = ref<UserInfo>({
   updatedAt: '',
 })
 
+const textBlocksLoc: Ref<string[]> = ref([])
+let inputAnswers: { location: any; answer: string }[] = []
+const submitPuzzles = async () => {
+  inputAnswers = []
+  textBlocksLoc.value.forEach((item: any) => {
+    const row = parseInt(item.split(',')[0])
+    const col = parseInt(item.split(',')[1])
+    const input = document
+      .querySelector(`.fillin-col .fillin-row:nth-child(${row}) > div:nth-child(${col})`)
+      ?.querySelector('input') as HTMLInputElement
+    const inputValue = input.value
+    console.log('inputValue111', inputValue)
+    inputAnswers.push({
+      location: item,
+      answer: inputValue,
+    })
+  })
+  console.log('inputAnswers', inputAnswers)
+  const body = {
+    id: 1,
+    answer: inputAnswers,
+  }
+  try {
+    const response = await postSubmitPuzzles(body)
+    console.log('提交成功', response)
+  } catch (error) {
+    console.error('提交失败', error)
+  }
+  // 提交逻辑
+  // try {
+  //   const response = await submitPuzzles({ ...pageStore.phoneNumber, inputValues })
+  //   console.log('提交成功', response)
+  //   showToast('提交成功')
+  // } catch (error) {
+  //   console.error('提交失败', error)
+  //   showToast('提交失败')
+  // }
+}
+
 onMounted(async () => {
   console.log('mounted pageStore.phoneNumber', pageStore.phoneNumber)
   if (!pageStore.phoneNumber.length) {
@@ -664,18 +642,18 @@ onMounted(async () => {
   const puzzles = await getPuzzles(2)
   const horPuzzlesLoc: Array<string> = []
   const verPuzzlesLoc: Array<string> = []
-  const textBlocksLoc: Set<string> = new Set()
+  const textBlocksLocSet: Set<string> = new Set()
 
   const acrossClues: Array<{ [key: string]: any }> = puzzles.across_clues
   acrossClues.forEach((item: { [key: string]: any }) => {
     horPuzzlesLoc.push(transPuzzlePosition(item.location))
     rowPuzzles.value.push(item.clue)
-    textBlocksLoc.add(item.location)
+    textBlocksLocSet.add(item.location)
     let beginIndex = parseInt(item.location.split(',')[1])
     const cnt = cntChineseChars(item.answer)
     const endIndex = beginIndex + cnt
     for (beginIndex; beginIndex < endIndex; beginIndex++) {
-      textBlocksLoc.add(item.location.split(',')[0] + ',' + beginIndex.toString())
+      textBlocksLocSet.add(item.location.split(',')[0] + ',' + beginIndex.toString())
       // console.log('beginIndex', beginIndex)
     }
   })
@@ -683,16 +661,16 @@ onMounted(async () => {
   downClues.forEach((item: { [key: string]: any }) => {
     verPuzzlesLoc.push(transPuzzlePosition(item.location))
     colPuzzles.value.push(item.clue)
-    textBlocksLoc.add(item.location)
+    textBlocksLocSet.add(item.location)
     let beginIndex = parseInt(item.location.split(',')[0])
     const cnt = cntChineseChars(item.answer)
     const endIndex = beginIndex + cnt
     for (beginIndex; beginIndex < endIndex; beginIndex++) {
-      textBlocksLoc.add(beginIndex.toString() + ',' + item.location.split(',')[1])
+      textBlocksLocSet.add(beginIndex.toString() + ',' + item.location.split(',')[1])
     }
   })
-  console.log('horPuzzlesLoc,verPuzzlesLoc', horPuzzlesLoc, verPuzzlesLoc)
-  const disabledInpt = findMissingCoordinates(textBlocksLoc)
+  console.log('textBlocksLocSet', textBlocksLocSet)
+  const disabledInpt = findMissingCoordinates(textBlocksLocSet)
   console.log('disabledInpt', disabledInpt)
   disabledInputIndies.value = disabledInpt.map((item: any) => transPuzzlePosition(item))
   console.log('disabledInputIndies', disabledInputIndies.value)
@@ -703,6 +681,10 @@ onMounted(async () => {
 
   puzShow.value = rowPuzzles.value[0]
   inputFirstLoc.value = horPuzzlesLoc[0]
+
+  // 提交逻辑
+  textBlocksLoc.value = Array.from(textBlocksLocSet)
+
   disabledInput()
   heightLightInput()
 })
@@ -721,6 +703,11 @@ onMounted(async () => {
     font-size: large;
   }
 
+  .submit-button {
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+  }
   .fillin-col {
     display: flex;
     flex: 7;

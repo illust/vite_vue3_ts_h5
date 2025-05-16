@@ -7,6 +7,10 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "types": ["element-plus/global", "node"], //指定全局组件类型
+    "paths": {
+      "pkg": ["./packages"], 
+      "@/*": ["./src/*"], 
+    },
     
 
     /* Bundler mode */
@@ -23,6 +27,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue","auto-imports.d.ts", "components.d.ts"],
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.tsx", "src/**/*.vue","auto-imports.d.ts", "components.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
