@@ -58,6 +58,9 @@
       <van-count-down class="count-down" :time="time" format="HH:mm:ss" />
     </template>
   </van-floating-bubble>
+  <van-popup v-model:show="showCenter" round :style="{ padding: '64px' }"
+    >您的正确率为：{{ score }}</van-popup
+  >
   <bottom-nav></bottom-nav>
 </template>
 
@@ -66,7 +69,7 @@ import BottomNav from '@/components/BottomNav/index.vue'
 import { getAccessToken, getPhoneNumber, getUserInfo } from '@/service/api/miniprog/getPhoneNumber'
 import { getPuzzles, postSubmitPuzzles } from '@/service/api/puzzle/getPuzzles'
 import { usePageStore } from '@/store'
-import { cntChineseChars, transPuzzlePosition, findMissingCoordinates } from '@/utils/transform'
+import { cntChineseChars, findMissingCoordinates, transPuzzlePosition } from '@/utils/transform'
 import wx from 'weixin-js-sdk'
 // import SubmitButton from '@/components/SubmitButton/index.vue'
 import { showToast } from 'vant'
@@ -76,6 +79,8 @@ const route = useRoute()
 const highLight = ref(false)
 const puzShow = ref('')
 const pageStore = usePageStore()
+const showCenter = ref(false) // 是否显示得分弹窗
+const score = ref(0) // 得分
 
 // 固定位置input置为disabled,黑色输入框
 const disabledInputIndies = ref([])
@@ -606,12 +611,15 @@ const submitPuzzles = async () => {
   })
   console.log('inputAnswers', inputAnswers)
   const body = {
-    id: 1,
+    id: 2,
+    phoneNumber: pageStore.phoneNumber.phoneNumber,
     answer: inputAnswers,
   }
   try {
     const response = await postSubmitPuzzles(body)
-    console.log('提交成功', response)
+    console.log('提交成功！您的正确率为：', response)
+    score.value = response
+    showCenter.value = true
   } catch (error) {
     console.error('提交失败', error)
   }
