@@ -606,7 +606,8 @@ const submitPuzzles = async () => {
   })
   console.log('inputAnswers', inputAnswers)
   const body = {
-    id: 1,
+    id: 2,
+    phoneNumber: pageStore.phoneNumber.phoneNumber,
     answer: inputAnswers,
   }
   try {
